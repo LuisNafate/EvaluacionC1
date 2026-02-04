@@ -1,0 +1,35 @@
+# Dependencias
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build de Next.js
+.next/
+out/
+
+# Archivos de entorno local
+.env.local
+.env*.local
+
+# Archivos de desarrollo
+.vscode/
+.idea/
+
+# Git
+.git
+.gitignore
+
+# Tests
+coverage/
+.nyc_output/
+
+# Varios
+*.log
+.DS_Store
+Thumbs.db
+
+# README y documentación
+README.md
+plan.md
+contexto.md
