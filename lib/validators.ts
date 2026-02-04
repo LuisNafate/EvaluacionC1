@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Schema para validar números con valores por defecto
+// Schema para validar numeros con valores por defecto
 export const intSchema = (defaultValue: number) => 
   z.string().nullish().transform((val) => {
     if (!val) return defaultValue;
@@ -8,7 +8,7 @@ export const intSchema = (defaultValue: number) =>
     return isNaN(parsed) ? defaultValue : parsed;
   });
 
-// Schema para números con rango (min-max)
+// Schema para numeros con rango (min-max)
 export const clampedIntSchema = (defaultValue: number, min: number, max: number) =>
   intSchema(defaultValue).transform((val) => Math.max(min, Math.min(max, val)));
 
@@ -18,14 +18,14 @@ export const dateFormatSchema = z.string().refine((dateStr) => {
   if (!regex.test(dateStr)) return false;
   const date = new Date(dateStr);
   return date instanceof Date && !isNaN(date.getTime());
-}, { message: 'Formato de fecha inválido. Debe ser YYYY-MM-DD' });
+}, { message: 'Formato de fecha invalido. Debe ser YYYY-MM-DD' });
 
-// Schema para texto de búsqueda
+// Schema para texto de busqueda
 export const searchSchema = z.string().nullish()
   .transform((val) => val?.trim() || '')
   .pipe(z.string().max(100));
 
-// Schema para validar categoría (1-8)
+// Schema para validar categoria (1-8)
 export const categorySchema = z.number().int().min(1).max(8);
 
 // Schema para validar rango de fechas
@@ -36,7 +36,7 @@ export const dateRangeSchema = z.object({
   message: 'La fecha inicial debe ser anterior o igual a la fecha final'
 });
 
-// Schema para paginación
+// Schema para paginacion
 export const paginationSchema = z.object({
   page: clampedIntSchema(1, 1, 1000),
   limit: clampedIntSchema(10, 1, 100)

@@ -27,7 +27,7 @@ export interface InventoryRisk {
   stock_actual: number;
   price: number;
   ventas_ultimos_30_dias: number;
-  risk_level: 'Sin Stock' | 'Crítico' | 'Bajo' | 'Medio' | 'Suficiente';
+  risk_level: 'Sin Stock' | 'Critico' | 'Bajo' | 'Medio' | 'Suficiente';
   porcentaje_riesgo: number;
   active: boolean;
 }
@@ -50,6 +50,6 @@ export interface PaymentMix {
   num_payments: number;
   avg_per_payment: number;
   porcentaje: number;
-  tipo_metodo: 'Método Tradicional' | 'Método Electrónico' | 'Método Digital' | 'Otro';
+  tipo_metodo: 'Metodo Tradicional' | 'Metodo Electronico' | 'Metodo Digital' | 'Otro';
 }
 
