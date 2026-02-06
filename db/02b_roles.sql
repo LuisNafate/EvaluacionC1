@@ -6,10 +6,12 @@ BEGIN;
 CREATE SCHEMA IF NOT EXISTS reports;
 
 -- Creamos el usuario app_user (si no existe)
+-- Nota: en produccion este usuario deberia tener password configurado via variables de entorno
+-- Para este proyecto de desarrollo, no necesita password ya que solo tiene permisos de lectura
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'app_user') THEN
-    CREATE ROLE app_user WITH LOGIN PASSWORD 'app_pass';
+    CREATE ROLE app_user WITH LOGIN;
   END IF;
 END
 $$;

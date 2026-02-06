@@ -145,7 +145,7 @@ Para verificar que el usuario solo puede hacer SELECT en las vistas y no en las 
 
 **1. Conectarse como app_user:**
 ```sql
--- En psql conectarse con: psql -U app_user -d cafeteria
+-- En psql conectarse con: psql -U app_user -d cafeteria -h localhost
 ```
 
 **2. Intentar SELECT en una vista (debe funcionar):**
