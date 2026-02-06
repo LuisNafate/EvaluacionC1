@@ -31,7 +31,7 @@ POSTGRES_USER=tu_usuario
 POSTGRES_PASSWORD=tu_password
 ```
 
-Nota: Las credenciales te seran proporcionadas por separado. Asegurate de que todos los valores coincidan.
+Nota: Las credenciales le seran proporcionadas por separado. Asegurando de que todos los valores coincidan.
 
 3. **Levantar los contenedores:**
 ```bash
