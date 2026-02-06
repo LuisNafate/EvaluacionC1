@@ -27,11 +27,11 @@ cp .env.example .env
 Edita el archivo `.env` y configura las credenciales de PostgreSQL:
 ```env
 POSTGRES_DB=cafeteria
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=admin
+POSTGRES_USER=tu_usuario
+POSTGRES_PASSWORD=tu_password
 ```
 
-Nota: Puedes cambiar los valores por los que prefieras, pero asegurate de que coincidan en todas las variables.
+Nota: Las credenciales te seran proporcionadas por separado. Asegurate de que todos los valores coincidan.
 
 3. **Levantar los contenedores:**
 ```bash
