@@ -3,16 +3,16 @@ services:
     image: postgres:17-alpine
     container_name: cafeteria-db
     environment:
-      POSTGRES_DB: cafeteria
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cafeteria"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 10s
       retries: 20
@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile
     container_name: cafeteria-web
     environment:
-      DATABASE_URL: postgresql://postgres:admin@db:5432/cafeteria
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       NODE_ENV: production
     ports:
       - "3000:3000"

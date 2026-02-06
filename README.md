@@ -6,13 +6,30 @@ Este proyecto es un dashboard de reportes para una cafeteria que vende diferente
 
 ### Opcion 1: Con Docker (recomendado)
 
-Solo necesitas tener Docker instalado. Despues abres una terminal en la carpeta del proyecto y ejecutas:
+1. Clonar el repositorio y entrar a la carpeta:
+```bash
+git clone https://github.com/LuisNafate/EvaluacionC1.git
+cd EvaluacionC1
+```
 
+2. Crear un archivo `.env` (copia de `.env.example`) con tus credenciales:
+```bash
+cp .env.example .env
+```
+
+3. Editar el archivo `.env` y configurar las credenciales de la base de datos:
+```env
+POSTGRES_DB=cafeteria
+POSTGRES_USER=tu_usuario
+POSTGRES_PASSWORD=tu_password
+```
+
+4. Levantar los contenedores:
 ```bash
 docker-compose up --build
 ```
 
-Esto levanta la base de datos con usuario `postgres` y password `admin`, y la aplicacion web. Despues de unos segundos ya puedes abrir el navegador en http://localhost:3000 y ver el dashboard.
+Despues de unos segundos ya puedes abrir el navegador en http://localhost:3000 y ver el dashboard.
 
 ### Opcion 2: Con base de datos local
 
