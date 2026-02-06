@@ -1,30 +1,30 @@
 -- 02_seed.sql
--- Datos realistas y creíbles para demostrar reportes
+-- Datos realistas y creibles para demostrar reportes
 BEGIN;
 
--- Categorías (8 categorías)
+-- Categorias (8 categorias)
 INSERT INTO categories (name) VALUES
-  ('Cafés'),
-  ('Tés e Infusiones'),
+  ('Cafes'),
+  ('Tes e Infusiones'),
   ('Postres'),
   ('Sandwiches'),
-  ('Bebidas Frías'),
+  ('Bebidas Frias'),
   ('Desayunos'),
   ('Snacks'),
   ('Especiales');
 
 -- Productos (25 productos con variedad de stock)
 INSERT INTO products (name, category_id, price, stock, active) VALUES
-  -- Cafés
+  -- Cafes
   ('Espresso', 1, 35.00, 50, TRUE),
   ('Americano', 1, 40.00, 45, TRUE),
   ('Cappuccino', 1, 50.00, 40, TRUE),
   ('Latte', 1, 55.00, 35, TRUE),
   ('Mocha', 1, 60.00, 8, TRUE), -- stock bajo
   
-  -- Tés
-  ('Té Verde', 2, 35.00, 30, TRUE),
-  ('Té Negro', 2, 35.00, 25, TRUE),
+  -- Tes
+  ('Te Verde', 2, 35.00, 30, TRUE),
+  ('Te Negro', 2, 35.00, 25, TRUE),
   ('Chai Latte', 2, 50.00, 4, TRUE), -- stock bajo
   
   -- Postres
@@ -38,7 +38,7 @@ INSERT INTO products (name, category_id, price, stock, active) VALUES
   ('Panini de Pollo', 4, 85.00, 5, TRUE), -- stock bajo
   ('Wrap Vegetariano', 4, 80.00, 15, TRUE),
   
-  -- Bebidas Frías
+  -- Bebidas Frias
   ('Limonada Natural', 5, 40.00, 35, TRUE),
   ('Smoothie Fresa', 5, 60.00, 25, TRUE),
   ('Jugo Naranja', 5, 45.00, 30, TRUE),
@@ -53,33 +53,33 @@ INSERT INTO products (name, category_id, price, stock, active) VALUES
   ('Papas Fritas', 7, 50.00, 28, TRUE),
   
   -- Especiales
-  ('Café de Especialidad', 8, 85.00, 10, TRUE),
+  ('Cafe de Especialidad', 8, 85.00, 10, TRUE),
   ('Cold Brew', 8, 70.00, 1, TRUE); -- stock bajo
 
 -- Clientes (20 clientes)
 INSERT INTO customers (name, email) VALUES
-  ('Ana Martínez', 'ana.martinez@email.com'),
-  ('Carlos López', 'carlos.lopez@email.com'),
-  ('María García', 'maria.garcia@email.com'),
-  ('Juan Rodríguez', 'juan.rodriguez@email.com'),
-  ('Laura Hernández', 'laura.hernandez@email.com'),
-  ('Pedro Sánchez', 'pedro.sanchez@email.com'),
-  ('Carmen Díaz', 'carmen.diaz@email.com'),
-  ('Luis Pérez', 'luis.perez@email.com'),
+  ('Ana Martinez', 'ana.martinez@email.com'),
+  ('Carlos Lopez', 'carlos.lopez@email.com'),
+  ('Maria Garcia', 'maria.garcia@email.com'),
+  ('Juan Rodriguez', 'juan.rodriguez@email.com'),
+  ('Laura Hernandez', 'laura.hernandez@email.com'),
+  ('Pedro Sanchez', 'pedro.sanchez@email.com'),
+  ('Carmen Diaz', 'carmen.diaz@email.com'),
+  ('Luis Perez', 'luis.perez@email.com'),
   ('Isabel Torres', 'isabel.torres@email.com'),
-  ('Miguel Ramírez', 'miguel.ramirez@email.com'),
+  ('Miguel Ramirez', 'miguel.ramirez@email.com'),
   ('Rosa Flores', 'rosa.flores@email.com'),
   ('Jorge Castro', 'jorge.castro@email.com'),
   ('Elena Morales', 'elena.morales@email.com'),
-  ('Roberto Jiménez', 'roberto.jimenez@email.com'),
+  ('Roberto Jimenez', 'roberto.jimenez@email.com'),
   ('Patricia Ruiz', 'patricia.ruiz@email.com'),
-  ('Fernando Gómez', 'fernando.gomez@email.com'),
-  ('Lucía Vargas', 'lucia.vargas@email.com'),
-  ('Andrés Mendoza', 'andres.mendoza@email.com'),
-  ('Sofía Ortiz', 'sofia.ortiz@email.com'),
+  ('Fernando Gomez', 'fernando.gomez@email.com'),
+  ('Lucia Vargas', 'lucia.vargas@email.com'),
+  ('Andres Mendoza', 'andres.mendoza@email.com'),
+  ('Sofia Ortiz', 'sofia.ortiz@email.com'),
   ('Ricardo Silva', 'ricardo.silva@email.com');
 
--- Órdenes (55 órdenes distribuidas en Enero-Febrero 2026)
+-- ordenes (55 ordenes distribuidas en Enero-Febrero 2026)
 -- Enero 2026
 INSERT INTO orders (customer_id, created_at, status, channel) VALUES
   (1, '2026-01-02 08:15:00', 'paid', 'mostrador'),
@@ -141,9 +141,7 @@ INSERT INTO orders (customer_id, created_at, status, channel) VALUES
 
 -- Order items (2-3 items por orden)
 INSERT INTO order_items (order_id, product_id, qty, unit_price) VALUES
--- Order items (2-3 items por orden)
-INSERT INTO order_items (order_id, product_id, qty, unit_price) VALUES
-  -- Enero (órdenes 1-42)
+  -- Enero (ordenes 1-42)
   (1, 1, 2, 35.00), (1, 10, 1, 55.00),
   (2, 3, 1, 50.00), (2, 9, 1, 75.00),
   (3, 4, 2, 55.00), (3, 12, 1, 40.00),
@@ -187,7 +185,7 @@ INSERT INTO order_items (order_id, product_id, qty, unit_price) VALUES
   (40, 1, 2, 35.00), (40, 9, 1, 75.00),
   (41, 15, 1, 80.00), (41, 16, 1, 40.00),
   (42, 4, 2, 55.00), (42, 12, 1, 40.00),
-  -- Febrero (órdenes 43-53)
+  -- Febrero (ordenes 43-53)
   (43, 1, 2, 35.00), (43, 10, 1, 55.00),
   (44, 3, 1, 50.00), (44, 9, 1, 75.00),
   (45, 13, 1, 95.00), (45, 18, 1, 45.00),
@@ -202,7 +200,6 @@ INSERT INTO order_items (order_id, product_id, qty, unit_price) VALUES
 
 -- Payments (1 payment por orden pagada)
 INSERT INTO payments (order_id, method, paid_amount) VALUES
-  -- Enero
   (1, 'efectivo', 125.00),
   (2, 'tarjeta', 125.00),
   (3, 'app_digital', 150.00),
