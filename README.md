@@ -6,52 +6,86 @@ Este proyecto es un dashboard de reportes para una cafeteria que vende diferente
 
 ### Opcion 1: Con Docker (recomendado)
 
-1. Clonar el repositorio y entrar a la carpeta:
+**Requisitos:**
+- Docker y Docker Compose instalados
+
+**Pasos:**
+
+1. **Clonar el repositorio:**
 ```bash
 git clone https://github.com/LuisNafate/EvaluacionC1.git
 cd EvaluacionC1
 ```
 
-2. Crear un archivo `.env` (copia de `.env.example`) con tus credenciales:
+2. **Crear el archivo .env con las credenciales:**
+
+Copia el archivo de ejemplo:
 ```bash
 cp .env.example .env
 ```
 
-3. Editar el archivo `.env` y configurar las credenciales de la base de datos:
+Edita el archivo `.env` y configura las credenciales de PostgreSQL:
 ```env
 POSTGRES_DB=cafeteria
-POSTGRES_USER=tu_usuario
-POSTGRES_PASSWORD=tu_password
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=admin
 ```
 
-4. Levantar los contenedores:
+Nota: Puedes cambiar los valores por los que prefieras, pero asegurate de que coincidan en todas las variables.
+
+3. **Levantar los contenedores:**
 ```bash
 docker-compose up --build
 ```
 
-Despues de unos segundos ya puedes abrir el navegador en http://localhost:3000 y ver el dashboard.
+4. **Acceder a la aplicacion:**
 
-### Opcion 2: Con base de datos local
+Espera unos segundos hasta que los contenedores esten listos (veras el mensaje "Ready" en la consola). Despues abre tu navegador en:
+
+**http://localhost:3000**
+
+Para detener el proyecto: presiona `Ctrl+C` en la terminal, o ejecuta:
+```bash
+docker-compose down
+```
+
+### Opcion 2: Con base de datos local (sin Docker)
 
 Si ya tienes PostgreSQL instalado en tu maquina:
 
-1. Crea una base de datos llamada `cafeteria`
-2. Copia el archivo `.env.example` a `.env.local` y configura tu usuario y password de PostgreSQL
-3. Ejecuta los scripts SQL en orden:
-   ```bash
-   psql -U tu_usuario -d cafeteria -f db/01_schema.sql
-   psql -U tu_usuario -d cafeteria -f db/02_seed.sql
-   psql -U tu_usuario -d cafeteria -f db/02b_roles.sql
-   psql -U tu_usuario -d cafeteria -f db/03_reports_vw.sql
-   psql -U tu_usuario -d cafeteria -f db/04_indexes.sql
-   ```
-4. Instala dependencias y corre el proyecto:
-   ```bash
-   npm install
-   npm run dev
-   ```
+1. **Crear la base de datos:**
+```bash
+createdb cafeteria
+```
 
-El proyecto estara en http://localhost:3000
+2. **Configurar variables de entorno:**
+
+Copia el archivo `.env.example` a `.env.local`:
+```bash
+cp .env.example .env.local
+```
+
+Edita `.env.local` y configura tu conexion local:
+```env
+DATABASE_URL=postgresql://tu_usuario:tu_password@localhost:5432/cafeteria
+```
+
+3. **Ejecutar los scripts SQL en orden:**
+```bash
+psql -U tu_usuario -d cafeteria -f db/01_schema.sql
+psql -U tu_usuario -d cafeteria -f db/02_seed.sql
+psql -U tu_usuario -d cafeteria -f db/02b_roles.sql
+psql -U tu_usuario -d cafeteria -f db/03_reports_vw.sql
+psql -U tu_usuario -d cafeteria -f db/04_indexes.sql
+```
+
+4. **Instalar dependencias y ejecutar:**
+```bash
+npm install
+npm run dev
+```
+
+El proyecto estara en **http://localhost:3000**
 
 ## Estructura de la base de datos
 
