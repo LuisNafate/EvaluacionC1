@@ -1,6 +1,9 @@
 -- 01_schema.sql
 BEGIN;
 
+-- Crear schema para reportes
+CREATE SCHEMA IF NOT EXISTS reports;
+
 CREATE TABLE categories (
   id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name VARCHAR(100) NOT NULL

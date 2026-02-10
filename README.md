@@ -253,3 +253,49 @@ El dashboard tiene 5 reportes principales:
 
 Cada reporte usa su propia vista y tiene filtros para explorar los datos de diferentes formas.
 
+## Solucion de problemas comunes
+
+### Error: "relation reports.vw_inventory_risk does not exist"
+
+Si ves este error al levantar el proyecto con Docker, significa que los scripts SQL no se ejecutaron correctamente. Las causas comunes son:
+
+**Problema 1: Falta el esquema reports**
+El archivo `db/01_schema.sql` debe crear el esquema reports ANTES de crear las tablas:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS reports;
+```
+
+**Problema 2: Error de sintaxis en las vistas**
+Verifica que el archivo `db/03_reports_vw.sql` no tenga errores de sintaxis. Todas las vistas deben tener su CASE statement completo.
+
+**Solucion rapida:**
+1. Detener los contenedores: `docker-compose down -v` (el `-v` elimina los volumenes)
+2. Verificar que los archivos en `db/` esten correctos
+3. Volver a levantar: `docker-compose up --build`
+
+El flag `-v` es importante porque elimina el volumen de la base de datos y fuerza a que se ejecuten los scripts de inicializacion nuevamente.
+
+### Verificar que las vistas se crearon correctamente
+
+Conectarse a la base de datos en Docker:
+
+```bash
+docker exec -it cafeteria-db psql -U tu_usuario -d cafeteria
+```
+
+Luego ejecutar:
+
+```sql
+-- Ver todas las vistas en el esquema reports
+\dv reports.*
+
+-- Deberian aparecer:
+--  reports.vw_customer_value
+--  reports.vw_inventory_risk
+--  reports.vw_payment_mix
+--  reports.vw_sales_daily
+--  reports.vw_top_products_ranked
+```
+
+Si no aparecen las 5 vistas, hay un error en los scripts SQL.

@@ -193,6 +193,11 @@ SELECT
   -- calculamos el porcentaje de cada metodo
   ROUND((pt.total_amount / NULLIF(gt.total_general, 0)) * 100, 2) AS porcentaje,
   -- agregamos una etiqueta del tipo de metodo
+  CASE
+    WHEN pt.payment_method = 'cash' THEN 'Efectivo'
+    WHEN pt.payment_method = 'card' THEN 'Tarjeta'
+    WHEN pt.payment_method = 'app' THEN 'Digital'
+    ELSE 'Otro'
   END AS tipo_metodo
 FROM payment_totals pt
 CROSS JOIN grand_total gt
