@@ -1,47 +1,37 @@
-import { query } from '@/lib/db';
 import { CustomerValue } from '@/lib/types';
-import { validatePagination } from '@/lib/validators';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-
-// Traer valor de clientes con paginacion
-async function getCustomerValue(page = 1, limit = 10) {
-  const offset = (page - 1) * limit;
-  const sql = `
-    SELECT * FROM reports.vw_customer_value 
-    ORDER BY total_gastado DESC 
-    LIMIT ${limit} OFFSET ${offset}
-  `;
-  const data = await query<CustomerValue>(sql);
-  return data;
-}
-
-async function getTotalCount() {
-  const result = await query<{ total: string }>(
-    'SELECT COUNT(*) as total FROM reports.vw_customer_value'
-  );
-  return parseInt(result[0]?.total || '0', 10);
-}
 
 export default async function CustomerValuePage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; limit?: string }>;
 }) {
-  // Validar paginacion
   const params = await searchParams;
-  const { page, limit, offset } = validatePagination(
-    params.page,
-    params.limit
-  );
+  const page = params.page;
+  const limit = params.limit;
 
-  const customers = await getCustomerValue(page, limit);
-  const totalCount = await getTotalCount();
-  const totalPages = Math.ceil(totalCount / limit);
+  // Construir URL de la API
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const url = new URL(`${baseUrl}/api/reports/customer-value`);
+  if (page) {
+    url.searchParams.set('page', page);
+  }
+  if (limit) {
+    url.searchParams.set('limit', limit);
+  }
 
-  // KPI: clientes VIP
-  const vipCount = customers.filter(c => c.segmento_cliente === 'VIP').length;
+  // Llamar a la API
+  const response = await fetch(url.toString(), { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('Error al obtener valor de clientes');
+  }
+
+  const responseData = await response.json();
+  const customers: CustomerValue[] = responseData.data;
+  const { page: currentPage, limit: currentLimit, totalPages } = responseData.pagination;
+  const vipCount = responseData.kpi.vipCount;
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">
@@ -55,7 +45,6 @@ export default async function CustomerValuePage({
           Cuanto ha gastado cada cliente
         </p>
 
-        {/* KPI destacado */}
         <div className="mb-6">
           <p className="text-sm text-gray-600 mb-1">Clientes VIP</p>
           <p className="text-xl font-bold text-purple-600">
@@ -64,7 +53,6 @@ export default async function CustomerValuePage({
           <p className="text-sm text-gray-600">clientes con mas de $1000 gastados</p>
         </div>
 
-        {/* Tabla */}
         <div className="overflow-hidden">
           <table className="min-w-full">
             <thead className="bg-purple-600">
@@ -121,20 +109,20 @@ export default async function CustomerValuePage({
         {/* Paginacion */}
         {totalPages > 1 && (
           <div className="mt-6 flex justify-center gap-2">
-            {page > 1 && (
+            {currentPage > 1 && (
               <Link
-                href={`?page=${page - 1}&limit=${limit}`}
+                href={`?page=${currentPage - 1}&limit=${currentLimit}`}
                 className="px-4 py-2 border border-gray-300 hover:border-purple-500 hover:text-purple-600 transition-colors"
               >
                 Anterior
               </Link>
             )}
             <span className="px-4 py-2 text-gray-600">
-              Pagina {page} de {totalPages}
+              Pagina {currentPage} de {totalPages}
             </span>
-            {page < totalPages && (
+            {currentPage < totalPages && (
               <Link
-                href={`?page=${page + 1}&limit=${limit}`}
+                href={`?page=${currentPage + 1}&limit=${currentLimit}`}
                 className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 transition-colors"
               >
                 Siguiente

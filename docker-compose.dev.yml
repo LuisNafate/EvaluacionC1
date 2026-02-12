@@ -20,13 +20,12 @@ services:
       - cafeteria-network
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: cafeteria-web
+    image: node:20-slim
+    container_name: cafeteria-web-dev
+    working_dir: /app
     environment:
-      DATABASE_URL: postgresql://${DB_VIEWER_USER}:${DB_VIEWER_PASSWORD}@db:5432/${POSTGRES_DB}
-      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      NODE_ENV: development
     ports:
       - "3000:3000"
     depends_on:
@@ -34,6 +33,11 @@ services:
         condition: service_healthy
     networks:
       - cafeteria-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm start
     restart: unless-stopped
 
 volumes:

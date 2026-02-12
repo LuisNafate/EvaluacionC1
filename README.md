@@ -1,91 +1,84 @@
-# Sistema de Reportes para Cafeteria
+# Sistema de Reportes para Cafetería
 
-Este proyecto es un dashboard de reportes para una cafeteria que vende diferentes productos. Usa PostgreSQL para guardar la info y Next.js para mostrar los reportes en el navegador.
+Dashboard de reportes para una cafetería con PostgreSQL y Next.js 16.
 
-## Como levantar el proyecto
+## Inicio Rápido con Docker
 
-### Opcion 1: Con Docker (recomendado)
-
-**Requisitos:**
+### Requisitos
 - Docker y Docker Compose instalados
+- Git
 
-**Pasos:**
+### Pasos para Ejecutar
 
 1. **Clonar el repositorio:**
 ```bash
-git clone https://github.com/LuisNafate/EvaluacionC1.git
-cd EvaluacionC1
+git clone https://github.com/tu-usuario/tu-repo.git
+cd tu-repo
 ```
 
-2. **Crear el archivo .env con las credenciales:**
+2. **Configurar variables de entorno:**
 
 Copia el archivo de ejemplo:
 ```bash
 cp .env.example .env
 ```
 
-Edita el archivo `.env` y configura las credenciales de PostgreSQL:
+3. **IMPORTANTE: Editar el archivo `.env`**
+
+Abre `.env` y **CAMBIA LAS CONTRASEÑAS** por valores seguros:
+
 ```env
-POSTGRES_DB=cafeteria
-POSTGRES_USER=tu_usuario
-POSTGRES_PASSWORD=tu_password
+# Usuario ADMIN de PostgreSQL (para crear la BD)
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=TU_PASSWORD_ADMIN_AQUI
+
+# Usuario READ-ONLY para la aplicación (seguridad)
+DB_VIEWER_USER=app_readonly
+DB_VIEWER_PASSWORD=TU_PASSWORD_READONLY_AQUI
+
+# Clave secreta de la aplicación
+SECRET_KEY=TU_CLAVE_SECRETA_AQUI
 ```
 
-Nota: Las credenciales le seran proporcionadas por separado. Asegurando de que todos los valores coincidan.
+> **Seguridad**: La aplicación usa el usuario `app_readonly` que SOLO tiene permisos de lectura (SELECT). El usuario `postgres` solo se usa para inicializar la base de datos.
 
-3. **Levantar los contenedores:**
+4. **Iniciar los contenedores:**
 ```bash
-docker-compose up --build
+docker compose up -d
 ```
 
-4. **Acceder a la aplicacion:**
-
-Espera unos segundos hasta que los contenedores esten listos (veras el mensaje "Ready" en la consola). Despues abre tu navegador en:
-
-**http://localhost:3000**
-
-Para detener el proyecto: presiona `Ctrl+C` en la terminal, o ejecuta:
+5. **Verificar que todo está corriendo:**
 ```bash
-docker-compose down
+docker compose ps
 ```
 
-### Opcion 2: Con base de datos local (sin Docker)
+Deberías ver:
+- `cafeteria-db` → healthy
+- `cafeteria-web` → running
 
-Si ya tienes PostgreSQL instalado en tu maquina:
+6. **Acceder a la aplicación:**
 
-1. **Crear la base de datos:**
+Abre tu navegador en: **http://localhost:3000**
+
+### Comandos Útiles
+
 ```bash
-createdb cafeteria
+# Ver logs del frontend
+docker compose logs web -f
+
+# Ver logs de la base de datos
+docker compose logs db -f
+
+# Detener contenedores
+docker compose down
+
+# Detener y eliminar volúmenes (BORRA DATOS)
+docker compose down -v
+
+# Reconstruir imágenes
+docker compose build --no-cache
+docker compose up -d
 ```
-
-2. **Configurar variables de entorno:**
-
-Copia el archivo `.env.example` a `.env.local`:
-```bash
-cp .env.example .env.local
-```
-
-Edita `.env.local` y configura tu conexion local:
-```env
-DATABASE_URL=postgresql://tu_usuario:tu_password@localhost:5432/cafeteria
-```
-
-3. **Ejecutar los scripts SQL en orden:**
-```bash
-psql -U tu_usuario -d cafeteria -f db/01_schema.sql
-psql -U tu_usuario -d cafeteria -f db/02_seed.sql
-psql -U tu_usuario -d cafeteria -f db/02b_roles.sql
-psql -U tu_usuario -d cafeteria -f db/03_reports_vw.sql
-psql -U tu_usuario -d cafeteria -f db/04_indexes.sql
-```
-
-4. **Instalar dependencias y ejecutar:**
-```bash
-npm install
-npm run dev
-```
-
-El proyecto estara en **http://localhost:3000**
 
 ## Estructura de la base de datos
 

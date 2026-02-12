@@ -1,47 +1,32 @@
-import { query } from '@/lib/db';
 import { InventoryRisk } from '@/lib/types';
-import { categorySchema } from '@/lib/validators';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-
-// Traer productos con riesgo de inventario
-async function getInventoryRisk(categoryId?: number) {
-  let sql = 'SELECT * FROM reports.vw_inventory_risk WHERE 1=1';
-  const params: number[] = [];
-
-  if (categoryId) {
-    params.push(categoryId);
-    sql += ` AND category_id = $${params.length}`;
-  }
-
-  sql += ' ORDER BY porcentaje_riesgo DESC';
-  
-  const data = await query<InventoryRisk>(sql, params);
-  return data;
-}
 
 export default async function InventoryRiskPage({
   searchParams,
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
-  // Validar categoria (1-8)
   const params = await searchParams;
-  let categoryId: number | undefined;
-  if (params.category) {
-    const parsed = parseInt(params.category, 10);
-    if (categorySchema.safeParse(parsed).success) {
-      categoryId = parsed;
-    }
+  const categoryId = params.category;
+
+  // Construir URL de la API
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const url = new URL(`${baseUrl}/api/reports/inventory-risk`);
+  if (categoryId) {
+    url.searchParams.set('category', categoryId);
   }
 
-  const inventory = await getInventoryRisk(categoryId);
+  // Llamar a la API
+  const response = await fetch(url.toString(), { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('Error al obtener datos de inventario');
+  }
 
-  // KPI: productos criticos o sin stock
-  const criticalCount = inventory.filter(
-    item => item.risk_level === 'Critico' || item.risk_level === 'Sin Stock'
-  ).length;
+  const responseData = await response.json();
+  const inventory: InventoryRisk[] = responseData.data;
+  const criticalCount = responseData.kpi.criticalCount;
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">
@@ -55,7 +40,6 @@ export default async function InventoryRiskPage({
           Productos con poco stock
         </p>
 
-        {/* Filtro de categoria */}
         <form method="get" className="mb-6">
           <div className="flex gap-4">
             <div className="flex-1">
@@ -89,7 +73,6 @@ export default async function InventoryRiskPage({
           </div>
         </form>
 
-        {/* KPI destacado */}
         <div className="mb-6">
           <p className="text-sm text-gray-600 mb-1">Productos en Riesgo</p>
           <p className="text-xl font-bold text-purple-600">
@@ -98,7 +81,6 @@ export default async function InventoryRiskPage({
           <p className="text-sm text-gray-600">productos criticos o sin stock</p>
         </div>
 
-        {/* Tabla */}
         <div className="overflow-hidden">
           <table className="min-w-full">
             <thead className="bg-purple-600">

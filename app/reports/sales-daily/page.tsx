@@ -1,51 +1,36 @@
-import { query } from '@/lib/db';
 import { SalesDaily } from '@/lib/types';
-import { dateFormatSchema } from '@/lib/validators';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-
-// Traer los datos del servidor con filtros opcionales
-async function getSalesDaily(dateFrom?: string, dateTo?: string) {
-  let sql = 'SELECT * FROM reports.vw_sales_daily WHERE 1=1';
-  const params: string[] = [];
-
-  if (dateFrom) {
-    params.push(dateFrom);
-    sql += ` AND day >= $${params.length}`;
-  }
-  if (dateTo) {
-    params.push(dateTo);
-    sql += ` AND day <= $${params.length}`;
-  }
-
-  sql += ' ORDER BY day DESC';
-  
-  const data = await query<SalesDaily>(sql, params);
-  return data;
-}
 
 export default async function SalesDailyPage({
   searchParams,
 }: {
   searchParams: Promise<{ dateFrom?: string; dateTo?: string }>;
 }) {
-  // Validar fechas
   const params = await searchParams;
-  let dateFrom = params.dateFrom;
-  let dateTo = params.dateTo;
+  const dateFrom = params.dateFrom;
+  const dateTo = params.dateTo;
 
-  if (dateFrom && !dateFormatSchema.safeParse(dateFrom).success) {
-    dateFrom = undefined;
+  // Construir URL de la API
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const url = new URL(`${baseUrl}/api/reports/sales-daily`);
+  if (dateFrom) {
+    url.searchParams.set('dateFrom', dateFrom);
   }
-  if (dateTo && !dateFormatSchema.safeParse(dateTo).success) {
-    dateTo = undefined;
+  if (dateTo) {
+    url.searchParams.set('dateTo', dateTo);
   }
 
-  const sales = await getSalesDaily(dateFrom, dateTo);
+  // Llamar a la API
+  const response = await fetch(url.toString(), { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('Error al obtener ventas diarias');
+  }
 
-  // Calcular KPI: total de ventas de todos los dias
-  const totalVentas = sales.reduce((sum, item) => sum + Number(item.total_ventas), 0);
+  const responseData = await response.json();
+  const sales: SalesDaily[] = responseData.data;
+  const totalVentas = responseData.kpi.totalVentas;
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">
@@ -59,7 +44,6 @@ export default async function SalesDailyPage({
           Cuanto se vendio cada dia, cuantos tickets y el promedio
         </p>
 
-        {/* Filtros de fecha */}
         <form method="get" className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -95,7 +79,6 @@ export default async function SalesDailyPage({
           </div>
         </form>
 
-        {/* KPI destacado */}
         <div className="mb-6">
           <p className="text-sm text-gray-600 mb-1">Total de Ventas</p>
           <p className="text-xl font-bold text-purple-600">
@@ -103,7 +86,6 @@ export default async function SalesDailyPage({
           </p>
         </div>
 
-        {/* Tabla */}
         <div className="overflow-hidden">
           <table className="min-w-full">
             <thead className="bg-purple-600">

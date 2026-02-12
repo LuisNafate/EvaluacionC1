@@ -1,22 +1,22 @@
-import { query } from '@/lib/db';
 import { PaymentMix } from '@/lib/types';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-// Traer mix de pagos
-async function getPaymentMix() {
-  const data = await query<PaymentMix>(
-    'SELECT * FROM reports.vw_payment_mix ORDER BY total_amount DESC'
-  );
-  return data;
-}
-
 export default async function PaymentMixPage() {
-  const payments = await getPaymentMix();
+  // Construir URL de la API
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const url = `${baseUrl}/api/reports/payment-mix`;
 
-  // KPI: metodo mas usado
-  const topMethod = payments[0];
+  // Llamar a la API
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('Error al obtener mix de pagos');
+  }
+
+  const responseData = await response.json();
+  const payments: PaymentMix[] = responseData.data;
+  const topMethod = responseData.kpi.topMethod;
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">
@@ -30,7 +30,6 @@ export default async function PaymentMixPage() {
           Como pagan los clientes (efectivo, tarjeta, etc)
         </p>
 
-        {/* KPI destacado */}
         {topMethod && (
           <div className="mb-6">
             <p className="text-sm text-gray-600 mb-1">Metodo mas usado</p>
@@ -43,7 +42,6 @@ export default async function PaymentMixPage() {
           </div>
         )}
 
-        {/* Tabla */}
         <div className="overflow-hidden">
           <table className="min-w-full">
             <thead className="bg-purple-600">

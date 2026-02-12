@@ -1,59 +1,41 @@
-import { query } from '@/lib/db';
 import { TopProductRanked } from '@/lib/types';
-import { validatePagination, sanitizeSearch } from '@/lib/validators';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-
-// Traer los productos mas vendidos con busqueda y paginacion
-async function getTopProducts(search?: string, page = 1, limit = 10) {
-  let sql = 'SELECT * FROM reports.vw_top_products_ranked WHERE 1=1';
-  const params: string[] = [];
-
-  if (search) {
-    params.push(`%${search}%`);
-    sql += ` AND product_name ILIKE $${params.length}`;
-  }
-
-  sql += ' ORDER BY revenue_rank';
-  sql += ` LIMIT ${limit} OFFSET ${(page - 1) * limit}`;
-  
-  const data = await query<TopProductRanked>(sql, params);
-  return data;
-}
-
-async function getTotalCount(search?: string) {
-  let sql = 'SELECT COUNT(*) as total FROM reports.vw_top_products_ranked WHERE 1=1';
-  const params: string[] = [];
-
-  if (search) {
-    params.push(`%${search}%`);
-    sql += ` AND product_name ILIKE $${params.length}`;
-  }
-
-  const result = await query<{ total: string }>(sql, params);
-  return parseInt(result[0]?.total || '0', 10);
-}
 
 export default async function TopProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; page?: string; limit?: string }>;
 }) {
-  // Validar parametros
   const params = await searchParams;
-  const search = sanitizeSearch(params.search);
-  const { page, limit, offset } = validatePagination(
-    params.page,
-    params.limit
-  );
+  const search = params.search;
+  const page = params.page;
+  const limit = params.limit;
 
-  const products = await getTopProducts(search, page, limit);
-  const totalCount = await getTotalCount(search);
-  const totalPages = Math.ceil(totalCount / limit);
+  // Construir URL de la API
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const url = new URL(`${baseUrl}/api/reports/top-products`);
+  if (search) {
+    url.searchParams.set('search', search);
+  }
+  if (page) {
+    url.searchParams.set('page', page);
+  }
+  if (limit) {
+    url.searchParams.set('limit', limit);
+  }
 
-  // KPI: producto numero 1
-  const topProduct = products[0];
+  // Llamar a la API
+  const response = await fetch(url.toString(), { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('Error al obtener productos top');
+  }
+
+  const responseData = await response.json();
+  const products: TopProductRanked[] = responseData.data;
+  const { page: currentPage, limit: currentLimit, totalPages } = responseData.pagination;
+  const topProduct = responseData.kpi.topProduct;
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">
@@ -67,7 +49,6 @@ export default async function TopProductsPage({
           Los productos mas vendidos con ranking
         </p>
 
-        {/* Busqueda */}
         <form method="get" className="mb-6">
           <div className="flex gap-4">
             <div className="flex-1">
@@ -161,20 +142,20 @@ export default async function TopProductsPage({
         {/* Paginacion */}
         {totalPages > 1 && (
           <div className="mt-6 flex justify-center gap-2">
-            {page > 1 && (
+            {currentPage > 1 && (
               <Link
-                href={`?page=${page - 1}&limit=${limit}${search ? `&search=${search}` : ''}`}
+                href={`?page=${currentPage - 1}&limit=${currentLimit}${search ? `&search=${search}` : ''}`}
                 className="px-4 py-2 border border-gray-300 hover:border-purple-500 hover:text-purple-600 transition-colors"
               >
                 Anterior
               </Link>
             )}
             <span className="px-4 py-2 text-gray-600">
-              Pagina {page} de {totalPages}
+              Pagina {currentPage} de {totalPages}
             </span>
-            {page < totalPages && (
+            {currentPage < totalPages && (
               <Link
-                href={`?page=${page + 1}&limit=${limit}${search ? `&search=${search}` : ''}`}
+                href={`?page=${currentPage + 1}&limit=${currentLimit}${search ? `&search=${search}` : ''}`}
                 className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 transition-colors"
               >
                 Siguiente
